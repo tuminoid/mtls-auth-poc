@@ -1,0 +1,19 @@
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterSPIFFEID
+metadata:
+  name: default-workload-identity
+spec:
+  className: cilium-spire-cilium
+  spiffeIDTemplate: "spiffe://prod.metal3.local/ns/{{ .PodMeta.Namespace }}/sa/{{ .PodSpec.ServiceAccountName }}"
+  podSelector: {}
+  namespaceSelector:
+    matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values:
+          - kube-system
+          - kube-node-lease
+          - kube-public
+          - cilium-spire
+          - cert-manager
+  ttl: 1h

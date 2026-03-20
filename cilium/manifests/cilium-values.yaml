@@ -1,0 +1,5 @@
+encryption:
+  enabled: true
+  type: wireguard
+
+kubeProxyReplacement: true

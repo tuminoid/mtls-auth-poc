@@ -1,0 +1,15 @@
+# Cilium values for Istio Ambient compatibility
+kubeProxyReplacement: true
+
+# Allow Istio CNI to chain
+cni:
+  exclusive: false
+
+# Required for Istio compatibility
+socketLB:
+  hostNamespaceOnly: true
+
+# WireGuard for node-to-node encryption (defense in depth)
+encryption:
+  enabled: true
+  type: wireguard

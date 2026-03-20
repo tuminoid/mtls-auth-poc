@@ -1,0 +1,12 @@
+apiVersion: spire.spiffe.io/v1alpha1
+kind: ClusterStaticEntry
+metadata:
+  name: cilium-agent
+spec:
+  className: spire-system-spire
+  spiffeID: "spiffe://prod.metal3.local/cilium-agent"
+  parentID: "spiffe://prod.metal3.local/spire/agent/k8s_psat/example-cluster"
+  selectors:
+    - "k8s:ns:kube-system"
+    - "k8s:sa:cilium"
+  admin: true

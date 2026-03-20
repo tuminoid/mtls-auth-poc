@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: iptables-interception
+  namespace: envoy-system
+spec:
+  selector:
+    matchLabels:
+      app: iptables-interception
+  template:
+    metadata:
+      labels:
+        app: iptables-interception
+    spec:
+      hostNetwork: true
+      hostPID: true
+      serviceAccountName: envoy-proxy
+      initContainers:
+      - name: setup
+        image: alpine:3.23
+        command: [sh, -c]
+        args:
+        - |
+          apk add --no-cache iptables
+          # Get pod CIDR - only intercept pod-to-pod traffic
+          POD_CIDR="10.244.0.0/16"
+          # Clean previous rules
+          iptables -t nat -D OUTPUT -j ENVOY_OUT 2>/dev/null || true
+          iptables -t nat -D PREROUTING -j ENVOY_IN 2>/dev/null || true
+          iptables -t nat -F ENVOY_OUT 2>/dev/null || true
+          iptables -t nat -F ENVOY_IN 2>/dev/null || true
+          iptables -t nat -X ENVOY_OUT 2>/dev/null || true
+          iptables -t nat -X ENVOY_IN 2>/dev/null || true
+          iptables -t nat -N ENVOY_OUT
+          iptables -t nat -N ENVOY_IN
+          # OUTBOUND: only intercept traffic TO pod CIDR
+          iptables -t nat -A ENVOY_OUT -m owner --uid-owner 101 -j RETURN
+          iptables -t nat -A ENVOY_OUT -d 127.0.0.0/8 -j RETURN
+          iptables -t nat -A ENVOY_OUT -d 10.96.0.0/12 -j RETURN
+          iptables -t nat -A ENVOY_OUT ! -d ${POD_CIDR} -j RETURN
+          iptables -t nat -A ENVOY_OUT -p tcp -j REDIRECT --to-port 15001
+          # INBOUND: only intercept traffic FROM pod CIDR
+          iptables -t nat -A ENVOY_IN -p tcp --dport 15001 -j RETURN
+          iptables -t nat -A ENVOY_IN -p tcp --dport 15006 -j RETURN
+          iptables -t nat -A ENVOY_IN -d 127.0.0.0/8 -j RETURN
+          iptables -t nat -A ENVOY_IN ! -s ${POD_CIDR} -j RETURN
+          iptables -t nat -A ENVOY_IN -p tcp -j REDIRECT --to-port 15006
+          # Hook into main chains
+          iptables -t nat -A OUTPUT -j ENVOY_OUT
+          iptables -t nat -A PREROUTING -j ENVOY_IN
+          echo "iptables rules installed (pod CIDR: ${POD_CIDR})"
+        securityContext:
+          privileged: true
+      containers:
+      - name: pause
+        image: registry.k8s.io/pause:3.10
+      tolerations:
+      - operator: Exists

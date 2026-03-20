@@ -1,0 +1,15 @@
+global:
+  spire:
+    trustDomain: prod.metal3.local
+    clusterName: example-cluster
+
+spire-server:
+  replicaCount: 1
+
+spire-agent:
+  sockets:
+    admin:
+      enabled: true
+      mountOnHost: true
+  authorizedDelegates:
+    - "spiffe://prod.metal3.local/cilium-agent"

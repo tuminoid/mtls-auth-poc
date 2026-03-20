@@ -1,0 +1,6 @@
+# Cilium values for Ghostunnel POC (CNI + WireGuard only)
+kubeProxyReplacement: true
+
+encryption:
+  enabled: true
+  type: wireguard

@@ -1,0 +1,6 @@
+# Cilium values for Envoy POC (CNI + WireGuard only, no mTLS)
+kubeProxyReplacement: true
+
+encryption:
+  enabled: true
+  type: wireguard

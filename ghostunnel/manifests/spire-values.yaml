@@ -1,0 +1,23 @@
+# Standalone SPIRE values for Ghostunnel POC
+global:
+  spire:
+    trustDomain: prod.metal3.local
+    clusterName: mtls-poc
+
+spire-server:
+  replicaCount: 1
+  dataStore:
+    sql:
+      databaseType: sqlite3
+  controllerManager:
+    enabled: true
+    identities:
+      clusterSPIFFEIDs:
+        default:
+          enabled: true
+
+spire-agent:
+  sockets:
+    admin:
+      enabled: true
+      mountOnHost: true

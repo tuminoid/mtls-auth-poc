@@ -1,0 +1,21 @@
+# Reference: https://github.com/DavidAnson/markdownlint-cli2#markdownlint-cli2yaml
+
+config:
+  ul-style:
+    style: dash
+  ul-indent:
+    indent: 2
+  ol-prefix:
+    style: one
+  line-length:
+    tables: false
+    code_blocks: false
+  table-pipe-style:
+    style: compact
+  table-column-style:
+    style: leading_and_trailing
+  no-duplicate-heading:
+    siblings_only: true
+
+# Don't autofix anything, we're linting here
+fix: false

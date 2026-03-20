@@ -1,0 +1,23 @@
+encryption:
+  enabled: true
+  type: wireguard
+
+kubeProxyReplacement: true
+
+authentication:
+  enabled: true
+  mutual:
+    spire:
+      enabled: true
+      install:
+        enabled: true
+        namespace: cilium-spire
+        server:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+        agent:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+      trustDomain: prod.metal3.local
